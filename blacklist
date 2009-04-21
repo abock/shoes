@@ -12,6 +12,9 @@ libnsl.so
 libexpat.so
 libasound.so
 libxml2.so
+libsqlite3.so
+libsqlite.so
+
 libdbus-1.so
 libdbus-glib-1.so
 
@@ -24,6 +27,7 @@ libgconf-2.so
 libgdk-x11-2.0.so
 libgtk-x11-2.0.so
 libORBit-2.so
+libglade-2.0.so
 
 libgnome-2.so
 libgnomeui-2.so
@@ -54,6 +58,7 @@ libXrender.so
 libXext.so
 libXi.so
 libX11.so
+libXxf86vm.so
 libSM.so
 libxcb.so
 libxcb-xlib.so
@@ -65,3 +70,13 @@ libicudata.so
 libicui18n.so
 libicuuc.so
 
+libgstcontroller-0.10.so
+libgstbase-0.10.so
+libgstpbutils-0.10.so
+libgstdataprotocol-0.10.so
+libgstvideo-0.10.so
+libgstaudio-0.10.so
+libgstcdda-0.10.so
+libgstinterfaces-0.10.so
+libgsttag-0.10.so
+libgstreamer-0.10.so
