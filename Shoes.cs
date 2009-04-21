@@ -40,19 +40,34 @@ public static class Shoes
 {
     private static List<string> search_paths = new List<string> ();
     private static List<Assembly> assemblies = new List<Assembly> ();
+    private static List<string> blacklist = new List<string> ();
 
     private static List<string> native_files = new List<string> ();
     private static List<string> managed_files = new List<string> ();
     private static List<string> debug_files = new List<string> ();
     private static List<string> misc_files = new List<string> ();
+
+    private static string strip_dir = Path.Combine (Environment.CurrentDirectory, ".stripped-shoes");
+
+    private class BlacklistComparer : IEqualityComparer<string>
+    {
+        public bool Equals (string a, string b) { return Path.GetFileName (b).StartsWith (a); }
+        public int GetHashCode (string o) { return o.GetHashCode (); }
+    }
     
     public static void Main (string [] args)
     {
         string mono_binary = "/usr/bin/mono";
         bool show_help = false;
+        bool strip_binaries = true;
+        bool include_mdb = false;
+        string blacklist_file = null;
 
         var p = new OptionSet () {
             { "m|mono=", "which mono binary to use (/usr/bin/mono)", v => mono_binary = v },
+            { "s|strip", "strip native binaries of debug symbols", v => strip_binaries = v != null },
+            { "d|mdb", "include mdb files in summary", v => include_mdb = v != null },
+            { "b|blacklist=", "blacklist file to exclude native libraries from the summary", v => blacklist_file = v },
             { "h|help", "show this message and exit", v => show_help = v != null }
         };
 
@@ -74,6 +89,36 @@ public static class Shoes
             return;
         }
 
+        Console.WriteLine ("Shoes Configuration:");
+
+        foreach (var env in new string [] { "LD_LIBRARY_PATH", "MONO_PATH" }) {
+            var val = Environment.GetEnvironmentVariable (env);
+            if (!String.IsNullOrEmpty (val)) {
+                Console.WriteLine ("  $ export {0}={1}", env, val);
+            }
+        }
+        
+        Console.Write ("  $ mono Shoes.exe ");
+        if (blacklist_file != null) {
+            Console.Write ("--blacklist={0} ", blacklist_file);
+        }
+        if (!strip_binaries) {
+            Console.Write ("--strip- ");
+        }
+        if (include_mdb) {
+            Console.Write ("--mdb ");
+        }
+        foreach (var path in paths) {
+            Console.Write ("{0} ", path);
+        }
+        Console.WriteLine ();
+        Console.WriteLine ();
+
+        if (paths.Count == 0) {
+            Console.WriteLine ("Error: no paths to shoealyze");
+            return;
+        }
+
         FindNativeLibrarySearchPaths ();
         foreach (var path in paths) {
             Walk (path);
@@ -88,10 +133,31 @@ public static class Shoes
         }
 
         long total_size = 0;
-        var labels = new string [] { "Managed Code", "Native Code", "Debugging Symbols", "Misc Data" };
+        var labels = new string [] { 
+            "Managed Code",
+            "Native Code" + (strip_binaries ? " (stripped)" : String.Empty),
+            "Debugging Symbols",
+            "Misc Data"
+        };
         var items = new List<List<string>> () { managed_files, native_files, debug_files, misc_files };
         var sizes = new long[4];
         var size_pad = Int64.MaxValue.ToString ().Length;
+
+        if (!include_mdb) {
+            debug_files.Clear ();
+        }
+
+        if (blacklist_file != null) {
+            using (var reader = new StreamReader (blacklist_file)) {
+                string line = null;
+                while ((line = reader.ReadLine ()) != null) {
+                    line = line.Trim ();
+                    if (!String.IsNullOrEmpty (line) && line[0] != '#') {
+                        blacklist.Add (line);
+                    }
+                }
+            }
+        }
 
         for (int i = 0; i < items.Count; i++) {
             if (items[i].Count <= 0) {
@@ -101,12 +167,17 @@ public static class Shoes
             Console.WriteLine (labels[i]);
             Console.WriteLine (String.Empty.PadRight (labels[i].Length, '-'));
 
-            var result = from path in items[i]
+            var result = from path in 
+                items[i].Except (blacklist, new BlacklistComparer ())
                 orderby new FileInfo (path).Length descending
                 select path;
 
             foreach (var path in result) {
-                var stat = new FileInfo (path);
+                var size_path = path;
+                if (items[i] == native_files && strip_binaries) {
+                    size_path = StripBinary (path);
+                }
+                var stat = new FileInfo (size_path);
                 sizes[i] += stat.Length;
                 total_size += stat.Length;
                 Console.WriteLine ("{0}{1}", stat.Length.ToString ().PadRight (size_pad, ' '), path);
@@ -132,6 +203,11 @@ public static class Shoes
         Console.WriteLine ("{0}  {1} ({2:0.000} MB)",
             String.Empty.PadRight (max_len, ' '),
             total_size.ToString ().PadRight (10, ' '), total_size / 1024.0 / 1024.0);
+
+        try {
+            Directory.Delete (strip_dir, true);
+        } catch {
+        }
     }
 
     private static void Walk (string path)
@@ -171,6 +247,8 @@ public static class Shoes
                 break;
             case ".mdb":
                 LoadDebug (file);
+                break;
+            case ".la":
                 break;
             default:
                 if (!LddFile (file)) {
@@ -366,7 +444,12 @@ public static class Shoes
         string line;
         while ((line = proc.StandardOutput.ReadLine ()) != null) {
             line = line.Trim ();
-            line = line.Substring (0, line.IndexOf ('('));
+            int addr = line.IndexOf ('(');
+            if (addr < 0) {
+                continue;
+            }
+
+            line = line.Substring (0, addr);
             int map = line.IndexOf (" => ");
             if (map > 0) {
                 line = line.Substring (map + 4);
@@ -391,5 +474,19 @@ public static class Shoes
         native_files.Add (path);
         LddFile (path);
         return true;
+    }
+
+    private static string StripBinary (string path)
+    {
+        var out_path = Path.Combine (strip_dir, Path.GetFileName (path));
+        Directory.CreateDirectory (strip_dir);
+        var proc = Process.Start (new ProcessStartInfo ("strip", 
+            String.Format ("-g \"{0}\" -o \"{1}\"", path, out_path)) {
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false
+        });
+        proc.WaitForExit ();
+        return proc.ExitCode == 0 ? out_path : path;
     }
 }
