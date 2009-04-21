@@ -13,6 +13,7 @@ libexpat.so
 libasound.so
 libxml2.so
 libdbus-1.so
+libdbus-glib-1.so
 
 libglib-2.0.so
 libgobject-2.0.so
@@ -60,7 +61,6 @@ libxcb-render.so
 libxcb-render-util.so
 libICE.so
 
-# libicu
 libicudata.so
 libicui18n.so
 libicuuc.so
