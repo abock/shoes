@@ -1,5 +1,5 @@
 // 
-// TheseShoes.cs
+// Shoes.cs
 //  
 // Author:
 //       Aaron Bockover <abockover@novell.com>
@@ -36,7 +36,7 @@ using System.Xml.XPath;
 using System.Text.RegularExpressions;
 using Mono.Options;
 
-public static class TheseShoes
+public static class Shoes
 {
     private static List<string> search_paths = new List<string> ();
     private static List<Assembly> assemblies = new List<Assembly> ();
@@ -60,14 +60,14 @@ public static class TheseShoes
         try {
             paths = p.Parse (args);
         } catch (OptionException e) {
-            Console.Write ("TheseShoes: ");
+            Console.Write ("Shoes: ");
             Console.WriteLine (e.Message);
             Console.WriteLine ("Try --help for more information");
             return;
         }
 
         if (show_help) {
-            Console.WriteLine ("Usage: TheseShoes [OPTIONS]+ <managed_dir1> <managed_dir2>...");
+            Console.WriteLine ("Usage: Shoes [OPTIONS]+ <managed_dir1> <managed_dir2>...");
             Console.WriteLine ();
             Console.WriteLine ("Options:");
             p.WriteOptionDescriptions (Console.Out);
@@ -145,6 +145,10 @@ public static class TheseShoes
 
     private static void WalkDir (DirectoryInfo dir)
     {
+        if (dir.Name.StartsWith (".") && dir.Name != ".") {
+            return;
+        }
+
         foreach (var child_dir in dir.GetDirectories ()) {
             WalkDir (child_dir);
         }
@@ -156,6 +160,10 @@ public static class TheseShoes
 
     private static void LoadFile (FileInfo file)
     {
+        if (file.Name.StartsWith (".")) {
+            return;
+        }
+
         switch (Path.GetExtension (file.Name)) {
             case ".dll":
             case ".exe":

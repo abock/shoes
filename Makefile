@@ -1,5 +1,5 @@
-ASSEMBLY = TheseShoes.exe
-SOURCE = TheseShoes.cs Options.cs
+ASSEMBLY = Shoes.exe
+SOURCE = Shoes.cs Options.cs
 REFERENCES = -r:System.Core
 
 all: $(ASSEMBLY)
