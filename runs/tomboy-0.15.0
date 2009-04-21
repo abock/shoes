@@ -1,0 +1,64 @@
+Shoes Configuration:
+  $ export MONO_PATH=/usr/lib/tomboy
+  $ mono Shoes.exe --blacklist=blacklist /usr/lib/tomboy 
+
+Managed Code
+------------
+2562560            /usr/lib/mono/2.0/mscorlib.dll
+1598976            /usr/lib/mono/gac/System/2.0.0.0__b77a5c561934e089/System.dll
+1373696            /usr/lib/mono/gac/gtk-sharp/2.12.0.0__35e10195dab3c99f/gtk-sharp.dll
+1254400            /usr/lib/mono/gac/System.Xml/2.0.0.0__b77a5c561934e089/System.Xml.dll
+321024             /usr/lib/tomboy/Tomboy.exe
+237568             /usr/lib/mono/gac/gnome-sharp/2.24.0.0__35e10195dab3c99f/gnome-sharp.dll
+234496             /usr/lib/mono/gac/gdk-sharp/2.12.0.0__35e10195dab3c99f/gdk-sharp.dll
+184320             /usr/lib/mono/gac/Mono.Addins/0.4.0.0__0738eb9f132ed756/Mono.Addins.dll
+180224             /usr/lib/mono/gac/Mono.Posix/2.0.0.0__0738eb9f132ed756/Mono.Posix.dll
+150016             /usr/lib/mono/gac/Mono.Addins.Gui/0.4.0.0__0738eb9f132ed756/Mono.Addins.Gui.dll
+92160              /usr/lib/mono/gac/pango-sharp/2.12.0.0__35e10195dab3c99f/pango-sharp.dll
+89600              /usr/lib/mono/gac/Mono.Addins.Setup/0.4.0.0__0738eb9f132ed756/Mono.Addins.Setup.dll
+84480              /usr/lib/mono/gac/glib-sharp/2.12.0.0__35e10195dab3c99f/glib-sharp.dll
+81920              /usr/lib/mono/gac/gmime-sharp/2.2.0.0__677013d4cb5910f0/gmime-sharp.dll
+71680              /usr/lib/mono/gac/NDesk.DBus/1.0.0.0__f6716e4f9b2ed099/NDesk.DBus.dll
+54784              /usr/lib/mono/gac/Mono.Cairo/2.0.0.0__0738eb9f132ed756/Mono.Cairo.dll
+17408              /usr/lib/tomboy/addins/Bugzilla.dll
+17408              /usr/lib/tomboy/addins/ExportToHtml.dll
+16384              /usr/lib/mono/gac/gnome-panel-sharp/2.24.0.0__35e10195dab3c99f/gnome-panel-sharp.dll
+14336              /usr/lib/tomboy/addins/Evolution.dll
+13824              /usr/lib/mono/gac/gconf-sharp/2.24.0.0__35e10195dab3c99f/gconf-sharp.dll
+12800              /usr/lib/tomboy/addins/PrintNotes.dll
+10752              /usr/lib/mono/gac/gconf-sharp-peditors/2.24.0.0__35e10195dab3c99f/gconf-sharp-peditors.dll
+9728               /usr/lib/tomboy/addins/StickyNoteImport.dll
+9216               /usr/lib/tomboy/addins/InsertTimestamp.dll
+9216               /usr/lib/tomboy/addins/Tasque.Addin.dll
+8704               /usr/lib/tomboy/addins/WebDavSyncService.dll
+8704               /usr/lib/tomboy/addins/NoteOfTheDay.dll
+8192               /usr/lib/tomboy/addins/FileSystemSyncService.dll
+7680               /usr/lib/tomboy/addins/SshSyncServiceAddin.dll
+7680               /usr/lib/mono/gac/NDesk.DBus.GLib/1.0.0.0__f6716e4f9b2ed099/NDesk.DBus.GLib.dll
+6656               /usr/lib/tomboy/addins/Backlinks.dll
+5632               /usr/lib/tomboy/addins/FixedWidth.dll
+
+Native Code (stripped)
+----------------------
+2462184            /usr/bin/mono
+145888             /usr/lib64/libgtksharpglue-2.so
+97672              /usr/lib64/libMonoPosixHelper.so
+24656              /usr/lib/tomboy/libtomboy.so
+35560              /usr/lib64/libfam.so.0
+35016              /usr/lib64/libgnomesharpglue-2.so
+30888              /usr/lib64/libgdksharpglue-2.so
+14720              /usr/lib64/libglibsharpglue-2.so
+14424              /usr/lib64/libpangosharpglue-2.so
+10360              /usr/lib64/libgnomepanelsharpglue-2.so
+
+Misc Data
+---------
+337                /usr/lib/tomboy/Tomboy.exe.config
+
+Summary
+-------
+              Total Managed Code Size: 8756224    (8.351 MB)
+    Total Native Code (stripped) Size: 2871368    (2.738 MB)
+                 Total Misc Data Size: 337        (0.000 MB)
+
+                                       11627929   (11.089 MB)
