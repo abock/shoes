@@ -249,6 +249,7 @@ public static class Shoes
                 LoadDebug (file);
                 break;
             case ".la":
+            case ".a":
                 break;
             default:
                 if (!LddFile (file)) {
